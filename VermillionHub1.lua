@@ -77,6 +77,57 @@ MainTab:AddButton({
 	end
 })
 
+MainTab:AddButton({
+	Name = "Farm All win Locations",
+	Callback = function()
+		local player = game.Players.LocalPlayer
+		local char = player.Character or player.CharacterAdded:Wait()
+		local hrp = char:WaitForChild("HumanoidRootPart")
+
+		local locations = {
+			CFrame.new(9153.89258, 6911.06445, 123.499321, 0.472652435, -2.42196663e-08, -0.881248951, 2.72271228e-09, 1, -2.60230308e-08, 0.881248951, 9.90046178e-09, 0.472652435), -- Location 1
+			CFrame.new(14070.4639, 6911.06445, 123.685318, 0.0992648602, 6.90488307e-08, -0.99506104, 1.3604613e-09, 1, 6.95272675e-08, 0.99506104, -8.2553564e-09, 0.0992648602), -- Location 2
+			CFrame.new(19305.2598, 6911.06445, 123.029884, 0.952872574, -1.53685242e-09, -0.303370863, -2.45552023e-09, 1, -1.27785844e-08, 0.303370863, 1.2921296e-08, 0.952872574), -- Location 3
+			CFrame.new(4373.42578, 6911.06445, 123.408325, -0.866798937, -4.78178031e-08, -0.498657793, -4.11568113e-09, 1, -8.87388794e-08, 0.498657793, -7.48664561e-08, -0.866798937), -- Location 4
+			CFrame.new(-5020.96729, 6910.06445, -147.2789, -0.955857337, -5.65169078e-10, -0.29383117, -1.88307536e-10, 1, -1.31086819e-09, 0.29383117, -1.19767241e-09, -0.955857337), -- Location 5
+			CFrame.new(-69.7102432, 6911.06445, 0.36041218, 0.999012947, -1.08228448e-08, 0.0444196761, 6.24521235e-09, 1, 1.03192932e-07, -0.0444196761, -1.02813665e-07, 0.999012947), -- Location 6
+		}
+
+		for _, cf in ipairs(locations) do
+			hrp.CFrame = cf
+			task.wait(1) -- Adjust delay between teleports as needed
+		end
+	end    
+})
+			
+MainTab:AddToggle({
+	Name = "Advanced Autofarm Wins (New)",
+	Default = false,
+	Callback = function(Value)
+		getgenv().AutoFarmWins = Value
+		while getgenv().AutoFarmWins do
+			local player = game.Players.LocalPlayer
+			local char = player.Character or player.CharacterAdded:Wait()
+			local hrp = char:WaitForChild("HumanoidRootPart")
+
+			local locations = {
+				CFrame.new(9153.89258, 6911.06445, 123.499321, 0.472652435, -2.42196663e-08, -0.881248951, 2.72271228e-09, 1, -2.60230308e-08, 0.881248951, 9.90046178e-09, 0.472652435),
+				CFrame.new(14070.4639, 6911.06445, 123.685318, 0.0992648602, 6.90488307e-08, -0.99506104, 1.3604613e-09, 1, 6.95272675e-08, 0.99506104, -8.2553564e-09, 0.0992648602),
+				CFrame.new(19305.2598, 6911.06445, 123.029884, 0.952872574, -1.53685242e-09, -0.303370863, -2.45552023e-09, 1, -1.27785844e-08, 0.303370863, 1.2921296e-08, 0.952872574),
+				CFrame.new(4373.42578, 6911.06445, 123.408325, -0.866798937, -4.78178031e-08, -0.498657793, -4.11568113e-09, 1, -8.87388794e-08, 0.498657793, -7.48664561e-08, -0.866798937),
+				CFrame.new(-5020.96729, 6910.06445, -147.2789, -0.955857337, -5.65169078e-10, -0.29383117, -1.88307536e-10, 1, -1.31086819e-09, 0.29383117, -1.19767241e-09, -0.955857337),
+				CFrame.new(-69.7102432, 6911.06445, 0.36041218, 0.999012947, -1.08228448e-08, 0.0444196761, 6.24521235e-09, 1, 1.03192932e-07, -0.0444196761, -1.02813665e-07, 0.999012947),
+			}
+
+			for _, cf in ipairs(locations) do
+				if not getgenv().AutoFarmWins then break end
+				hrp.CFrame = cf
+				task.wait(1) -- Delay between teleports
+			end
+		end
+	end    
+})
+
 -- // TELEPORT TAB
 local TeleportTab = Window:MakeTab({
 	Name = "Teleports",
