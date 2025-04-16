@@ -500,6 +500,15 @@ GiveTab:AddTextbox({
     end
 })    	
     	
+GiveTab:AddTextbox({
+    Name = "Drill Speed Multiplier",  -- Name of the textbox
+    Default = "",            -- Default value shown
+    TextDisappear = true,              -- Makes the text disappear when losing focus
+    Callback = function(Value)        -- The function to handle input
+        game:GetService("Players").LocalPlayer.AmuletData.TotalDigSpeedMulti.Value = tonumber(Value)
+    end
+})	
+    	
 GiveTab:AddSection({ Name = "Gamepass Editor-" })
 			
 GiveTab:AddButton({
