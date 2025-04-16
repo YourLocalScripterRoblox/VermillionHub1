@@ -16,6 +16,31 @@ local MainTab = Window:MakeTab({
 	PremiumOnly = false
 })
 
+MainTab:AddTextbox({
+	Name = "Fake Money (Input the number)",
+	Default = "",
+	TextDisappear = true,
+	Callback = function(Value)
+		local amount = tonumber(Value)
+		if amount then
+			game:GetService("Players").LocalPlayer.leaderstats.Cash.Value = amount
+		end
+	end
+})
+
+MainTab:AddTextbox({
+	Name = "Fake Wins (Input the number)",
+	Default = "",
+	TextDisappear = true,
+	Callback = function(Value)
+		local amount = tonumber(Value)
+		if amount then
+			game:GetService("Players").LocalPlayer.leaderstats.Wins.Value = amount
+		end
+	end
+})
+
+
 MainTab:AddSection({ Name = "Main Features" })
 
 -- Dupe Money
@@ -37,16 +62,12 @@ MainTab:AddToggle({
 						giveCash:FireServer(tool)
 					end
 
-					task.wait()
+					task.wait(0)
 				end
 			end)
 		end
 	end
 })
-
--- Autofarm Wins
-local autofarmEnabled = false
-local cframeTarget = CFrame.new(19305.1348, 6907.95703, 123.215401)
 
 MainTab:AddToggle({
 	Name = "Autofarm Wins",
@@ -154,7 +175,7 @@ end
 
 TeleportTab:AddDropdown({
 	Name = "Select Teleport Location",
-	Default = "Main",
+	Default = "Select",
 	Options = locationNames,
 	Callback = function(selected)
 		local cf = teleportLocations[selected]
@@ -166,7 +187,27 @@ TeleportTab:AddDropdown({
 		end
 	end
 })
-	
+
+local TeleportWorlds = {
+    "Ancient Greek",
+    "Magic",
+    "Dinosaur",
+    "Main",
+    "Crystal",
+	    "Jungle",
+	    "Frozen"
+    -- Add more world names if needed
+}
+
+TeleportTab:AddDropdown({
+    Name = "Select World (change world)",
+    Default = "Select",
+    Options = TeleportWorlds,
+    Callback = function(selectedWorld)
+        game:GetService("ReplicatedStorage").ChangeWorld:InvokeServer(selectedWorld)
+    end
+})	
+		
 	TeleportTab:AddSection({ Name = "Player Teleports" })
 	
 	local Players = game:GetService("Players")
@@ -327,7 +368,7 @@ local EggsTab = Window:MakeTab({
     PremiumOnly = false
 })
 
-EggsTab:AddSection({ Name = "Pets-" })		
+EggsTab:AddSection({ Name = "Eggs-" })		
 			
 -- Egg names list
 local eggNames = {
@@ -388,6 +429,108 @@ EggsTab:AddButton({
 	end
 })	
 			
+-- Most overpowered Section
+-- // Give TAB
+local GiveTab = Window:MakeTab({
+	Name = "Give/Editor",
+	Icon = "rbxassetid://7733946818",
+	PremiumOnly = false
+})
+			
+		GiveTab:AddSection({ Name = "Drill Editor-" })		
+			
+GiveTab:AddButton({
+    Name = "Give Dev Drill",
+    Callback = function()
+        game.ReplicatedStorage.ViewportDrills.DEV.Parent = game.Players.LocalPlayer.Backpack
+    end
+})
+			
+GiveTab:AddDropdown({
+	Name = "Give Selected Drill (Some may not work)",
+	Default = "Select",
+	Options = {"DEV", "Herculean", "Olympian", "Aegean Tide", "Mystic Bore",
+			"Arcane Auger", "Spellboun", "Thornspike", "Vinecutter", "Permafrost",
+			"Icebreaker", "Glacier", "Volcano", "Amber", "Fossil"}, -- Add your drills here
+	Callback = function(Value)
+		local drill = game.ReplicatedStorage.ViewportDrills:FindFirstChild(Value)
+		if drill then
+			drill.Parent = game.Players.LocalPlayer.Backpack
+		end
+	end
+})
+			
+			local Options = {
+    "DEV", "Herculean", "Olympian", "Aegean Tide", "Mystic Bore",
+    "Arcane Auger", "Spellboun", "Thornspike", "Vinecutter", "Permafrost",
+    "Icebreaker", "Glacier", "Volcano", "Amber", "Fossil"
+}
+
+-- Function to equip all drills
+local function giveAllDrills()
+    for _, drillName in pairs(Options) do
+        local drill = game.ReplicatedStorage.ViewportDrills:FindFirstChild(drillName)
+        if drill then
+            drill.Parent = game.Players.LocalPlayer.Backpack
+        else
+            warn("Drill not found: " .. drillName)
+        end
+    end
+end
+
+-- Add the button to give all drills
+GiveTab:AddButton({
+    Name = "Give All Drills",
+    Callback = function()
+        giveAllDrills()
+    end    
+})
+    	
+GiveTab:AddTextbox({
+    Name = "Drill Power Multiplier (Dont Exceed 20)",
+    Default = "",
+    TextDisappear = false,
+    Callback = function(Value)
+        local num = tonumber(Value)
+        if num and num > 0 and num <= 20 then
+            game.Players.LocalPlayer.DrillPowerMultiplier.Value = num
+        else
+            warn("Invalid input. Enter a number between 1 and 20.")
+        end
+    end
+})    	
+    	
+GiveTab:AddSection({ Name = "Gamepass Editor-" })
+			
+GiveTab:AddButton({
+	Name = "Give x8 Hatch Gamepass",
+	Callback = function()
+		game:GetService("Players").LocalPlayer.Data.Gamepasses.X8EggsHatch.Value = true
+	end    
+})    	
+    	
+GiveTab:AddButton({
+	Name = "Give x3 Hatch Gamepass",
+	Callback = function()
+		game:GetService("Players").LocalPlayer.Data.Gamepasses.X3EggsHatch.Value = true
+	end    
+})    	    	
+    	
+GiveTab:AddButton({
+	Name = "Enable AutoDrill",
+	Callback = function()
+		local ReplicatedStorage = game:GetService("ReplicatedStorage")
+		local autoDrill = ReplicatedStorage:FindFirstChild("AutoDrill")
+		if autoDrill and autoDrill:IsA("RemoteEvent") then
+			autoDrill:FireServer(true)
+		elseif autoDrill and autoDrill:IsA("RemoteFunction") then
+			autoDrill:InvokeServer(true)
+		else
+			warn("AutoDrill not found or unsupported type.")
+		end
+	end    
+})
+    	
 -- // SETTINGS TAB
 local SettingsTab = Window:MakeTab({
 	Name = "Settings",
@@ -400,5 +543,4 @@ SettingsTab:AddButton({
 	Callback = function()
 		OrionLib:Destroy()
 	end
-})
-			
+}) 
