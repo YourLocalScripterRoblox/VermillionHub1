@@ -503,33 +503,11 @@ GiveTab:AddTextbox({
 GiveTab:AddSection({ Name = "Gamepass Editor-" })
 			
 GiveTab:AddButton({
-	Name = "Give x8 Hatch Gamepass",
+	Name = "Give x3,x8 Hatch Gamepass",
 	Callback = function()
 		game:GetService("Players").LocalPlayer.Data.Gamepasses.X8EggsHatch.Value = true
 	end    
 })    	
-    	
-GiveTab:AddButton({
-	Name = "Give x3 Hatch Gamepass",
-	Callback = function()
-		game:GetService("Players").LocalPlayer.Data.Gamepasses.X3EggsHatch.Value = true
-	end    
-})    	    	
-    	
-GiveTab:AddButton({
-	Name = "Enable AutoDrill",
-	Callback = function()
-		local ReplicatedStorage = game:GetService("ReplicatedStorage")
-		local autoDrill = ReplicatedStorage:FindFirstChild("AutoDrill")
-		if autoDrill and autoDrill:IsA("RemoteEvent") then
-			autoDrill:FireServer(true)
-		elseif autoDrill and autoDrill:IsA("RemoteFunction") then
-			autoDrill:InvokeServer(true)
-		else
-			warn("AutoDrill not found or unsupported type.")
-		end
-	end    
-})
     	
 -- // SETTINGS TAB
 local SettingsTab = Window:MakeTab({
