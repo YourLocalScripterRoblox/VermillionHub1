@@ -3,7 +3,7 @@
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/jensonhirst/Orion/main/source'))()
 
 local Window = OrionLib:MakeWindow({
-	Name = "Vermillion Hub",
+	Name = "Vermillion Hub | Version 1.03",
 	HidePremium = false,
 	SaveConfig = true,
 	ConfigFolder = "VermillionHub"
@@ -48,6 +48,32 @@ local autoCashEnabled = false
 
 MainTab:AddToggle({
 	Name = "Dupe Money (Hold Drill)",
+	Default = false,
+	Callback = function(Value)
+		autoCashEnabled = Value
+		if autoCashEnabled then
+			task.spawn(function()
+				while autoCashEnabled do
+					local player = game:GetService("Players").LocalPlayer
+					local tool = player.Character and player.Character:FindFirstChildWhichIsA("Tool")
+					local giveCash = game:GetService("ReplicatedStorage"):FindFirstChild("GiveCash")
+
+					if tool and giveCash then
+						giveCash:FireServer(tool)
+					end
+
+					task.wait(0)
+				end
+			end)
+		end
+	end
+})
+
+-- Dupe Money
+local autoCashEnabled = false
+
+MainTab:AddToggle({
+	Name = "Dupe Easter Tokens(Hold Drill)",
 	Default = false,
 	Callback = function(Value)
 		autoCashEnabled = Value
@@ -374,7 +400,7 @@ EggsTab:AddSection({ Name = "Eggs-" })
 local eggNames = {
     "Oceanic Egg", "Beach Egg", "Lava Egg", "Fossil Egg", "Jurassic Egg",
     "Glacier Egg", "Blizzard Egg", "Tropical Egg", "Jungle Egg", "Ember Egg",
-    "Enigma Egg", "Pantheon Egg", "Olympian Egg"
+    "Enigma Egg", "Pantheon Egg", "Olympian Egg", "Easter Egg"
 }
 
 local selectedEgg = "Oceanic Egg" -- Default egg
@@ -518,13 +544,70 @@ GiveTab:AddButton({
 	end    
 })    	
     	
+GiveTab:AddButton({
+    Name = "Give SuperLucky Gamepass",
+    Callback = function()
+        -- Granting the SuperLucky gamepass to the player
+        game:GetService("Players").LocalPlayer.Data.Gamepasses.SuperLucky.Value = true
+        print("SuperLucky gamepass granted!")
+    end    
+})    	
+    	
+-- // SAFE TAB
+local SafeTab = Window:MakeTab({
+	Name = "Safe",
+	Icon = "rbxassetid://7734056411",
+	PremiumOnly = false
+})    	
+    	
+-- Admin User IDs
+local adminUserIds = {
+	7608294518,
+	7480140891,
+	1003344545,
+	514156205,
+	7390635749
+}
+
+local kickMessage = "Admin detected. You have been kicked."
+local kickEnabled = false
+
+-- TextBox (for message)
+SafeTab:AddTextbox({
+	Name = "Kick Message",
+	Default = "",
+	TextDisappear = false,
+	Callback = function(text)
+		if text ~= "" then
+			kickMessage = text
+		end
+	end
+})
+
+-- Toggle (for enabling auto-kick)
+SafeTab:AddToggle({
+	Name = "Kick If Admin Joins",
+	Default = false,
+	Callback = function(Value)
+		kickEnabled = Value
+	end
+})
+
+-- Kick logic
+game.Players.PlayerAdded:Connect(function(player)
+	if not kickEnabled then return end
+	if table.find(adminUserIds, player.UserId) then
+		game.Players.LocalPlayer:Kick(kickMessage)
+	end
+end)
+    	
 -- // SETTINGS TAB
 local SettingsTab = Window:MakeTab({
 	Name = "Settings",
 	Icon = "rbxassetid://7734053495",
 	PremiumOnly = false
 })
-
+	
 SettingsTab:AddButton({
 	Name = "Unload GUI",
 	Callback = function()
