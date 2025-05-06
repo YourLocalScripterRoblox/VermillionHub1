@@ -3,7 +3,7 @@
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/jensonhirst/Orion/main/source'))()
 
 local Window = OrionLib:MakeWindow({
-	Name = "Vermillion Hub | Version 1.03",
+	Name = "Vermillion Hub | Version 1.04",
 	HidePremium = false,
 	SaveConfig = true,
 	ConfigFolder = "VermillionHub"
@@ -43,77 +43,135 @@ MainTab:AddTextbox({
 
 MainTab:AddSection({ Name = "Main Features" })
 
--- Dupe Money
-local autoCashEnabled = false
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local winsStat = player:WaitForChild("leaderstats"):WaitForChild("Wins")
+
+local savedWins = winsStat.Value
 
 MainTab:AddToggle({
-	Name = "Dupe Money (Hold Drill)",
+    Name = "Unlock all worlds",
+    Default = false,
+    Callback = function(enabled)
+        if enabled then
+            savedWins = winsStat.Value
+            winsStat.Value = 10000000
+        else
+            winsStat.Value = savedWins
+        end
+    end
+})
+
+-- Dupe money
+local autoCashEnabled = false
+local Threads = 2 -- How many times to dupe in parallel
+
+MainTab:AddToggle({
+	Name = "Normal Dupe Money (Hold Drill)",
 	Default = false,
 	Callback = function(Value)
 		autoCashEnabled = Value
 		if autoCashEnabled then
-			task.spawn(function()
-				while autoCashEnabled do
-					local player = game:GetService("Players").LocalPlayer
-					local tool = player.Character and player.Character:FindFirstChildWhichIsA("Tool")
-					local giveCash = game:GetService("ReplicatedStorage"):FindFirstChild("GiveCash")
+			for i = 1, Threads do
+				task.spawn(function()
+					while autoCashEnabled do
+						local player = game:GetService("Players").LocalPlayer
+						local tool = player.Character and player.Character:FindFirstChildWhichIsA("Tool")
+						local giveCash = game:GetService("ReplicatedStorage"):FindFirstChild("GiveCash")
 
-					if tool and giveCash then
-						giveCash:FireServer(tool)
+						if tool and giveCash then
+							giveCash:FireServer(tool)
+						end
+
+						task.wait(0)
 					end
-
-					task.wait(0)
-				end
-			end)
+				end)
+			end
 		end
 	end
 })
 
--- Dupe Money
+-- Dupe money
 local autoCashEnabled = false
+local Threads = 20 -- How many times to dupe in parallel
 
 MainTab:AddToggle({
-	Name = "Dupe Easter Tokens(Hold Drill)",
+	Name = "Fast Dupe Money (Hold Drill)",
 	Default = false,
 	Callback = function(Value)
 		autoCashEnabled = Value
 		if autoCashEnabled then
-			task.spawn(function()
-				while autoCashEnabled do
-					local player = game:GetService("Players").LocalPlayer
-					local tool = player.Character and player.Character:FindFirstChildWhichIsA("Tool")
-					local giveCash = game:GetService("ReplicatedStorage"):FindFirstChild("GiveCash")
+			for i = 1, Threads do
+				task.spawn(function()
+					while autoCashEnabled do
+						local player = game:GetService("Players").LocalPlayer
+						local tool = player.Character and player.Character:FindFirstChildWhichIsA("Tool")
+						local giveCash = game:GetService("ReplicatedStorage"):FindFirstChild("GiveCash")
 
-					if tool and giveCash then
-						giveCash:FireServer(tool)
+						if tool and giveCash then
+							giveCash:FireServer(tool)
+						end
+
+						task.wait(0)
 					end
-
-					task.wait(0)
-				end
-			end)
+				end)
+			end
 		end
 	end
 })
+
+-- Dupe Easter Tokens
+local autoEasterEnabled = false
+local Threads = 100 -- How many times to dupe in parallel
 
 MainTab:AddToggle({
-	Name = "Autofarm Wins",
+	Name = "Super fast Dupe Easter Tokens (Hold Drill)",
 	Default = false,
 	Callback = function(Value)
-		autofarmEnabled = Value
-		if autofarmEnabled then
-			task.spawn(function()
-				while autofarmEnabled do
-					local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-					if hrp then
-						hrp.CFrame = cframeTarget
+		autoEasterEnabled = Value
+		if autoEasterEnabled then
+			for i = 1, Threads do
+				task.spawn(function()
+					while autoEasterEnabled do
+						local player = game:GetService("Players").LocalPlayer
+						local tool = player.Character and player.Character:FindFirstChildWhichIsA("Tool")
+						local giveCash = game:GetService("ReplicatedStorage"):FindFirstChild("GiveCash")
+
+						if tool and giveCash then
+							giveCash:FireServer(tool)
+						end
+
+						task.wait(0)
 					end
-					task.wait(0.5)
-				end
-			end)
+				end)
+			end
 		end
 	end
 })
 
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local RunService = game:GetService("RunService")
+
+local isAutoDrilling = false
+local connection
+
+MainTab:AddToggle({
+    Name = "Auto drill",
+    Default = false,
+    Callback = function(state)
+        isAutoDrilling = state
+
+        if isAutoDrilling then
+            connection = RunService.RenderStepped:Connect(function()
+                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0) -- Press & hold
+            end)
+        else
+            if connection then connection:Disconnect() end
+            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0) -- Release
+        end
+    end
+})	
+				
 MainTab:AddButton({
 	Name = "Go to Surface",
 	Callback = function()
@@ -466,7 +524,7 @@ local GiveTab = Window:MakeTab({
 		GiveTab:AddSection({ Name = "Drill Editor-" })		
 			
 GiveTab:AddButton({
-    Name = "Give Dev Drill",
+    Name = "Give Dev Drill Patched",
     Callback = function()
         game.ReplicatedStorage.ViewportDrills.DEV.Parent = game.Players.LocalPlayer.Backpack
     end
